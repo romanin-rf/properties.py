@@ -1,5 +1,7 @@
 import re
-from typing import Any, Union
+from typing import Any, Union, Iterable, TypeVar, List
+
+T, NT = TypeVar("T"), TypeVar("NT")
 
 def is_comment_line(line: str) -> bool:
     c = 0
@@ -22,3 +24,10 @@ def conv(value: str) -> Union[Any, str]:
     try: return eval(stendel(value))
     except: pass
     return stendel(value)
+
+def removes(l: Iterable[Union[T, NT]], d: Iterable[NT]) -> List[T]:
+    dl = []
+    for i in l:
+        if i not in d:
+            dl.append(i)
+    return dl
