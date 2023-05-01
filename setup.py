@@ -3,7 +3,7 @@ import setuptools
 setuptools.setup(
     name="properties.py",
     keywords=["properties", "java"],
-    version="1.0.2",
+    version="1.1.0",
     description="Module for reading and writing properties-files.",
     long_description=open("README.md", "r", errors="ignore").read(),
     long_description_content_type="text/markdown",
@@ -19,7 +19,7 @@ setuptools.setup(
         "Operating System :: Unix",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
-        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.11"
     ],
     python_requires=">=3.9"
 )

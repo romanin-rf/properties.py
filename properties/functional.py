@@ -1,5 +1,5 @@
 import re
-from typing import Any, Union, Iterable, TypeVar, List
+from typing import Any, Union, Iterable, TypeVar, List, Dict
 
 T, NT = TypeVar("T"), TypeVar("NT")
 
@@ -31,3 +31,16 @@ def removes(l: Iterable[Union[T, NT]], d: Iterable[NT]) -> List[T]:
         if i not in d:
             dl.append(i)
     return dl
+
+def recursive_search_keys(data: Dict[str, Any]) -> List[List[str]]:
+    keys_paths = []
+    for key, value in data.items():
+        if isinstance(value, dict):
+            for key_path in recursive_search_keys(value):
+                keys_paths.append([key, *key_path])
+        else:
+            keys_paths.append([key])
+    return keys_paths
+
+def getter(key_path: List[str], data: Dict[str, Any]) -> Any:
+    return eval(f"data{''.join(['['+repr(key)+']' for key in key_path])}")

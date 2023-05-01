@@ -4,5 +4,7 @@ from .properties import (
     dump,
     dumps,
     loads_tree,
-    load_tree
+    load_tree,
+    dumps_tree,
+    dump_tree
 )

@@ -1,7 +1,7 @@
 from io import TextIOWrapper, StringIO
 from typing import Dict, Any
 # > Local Import's
-from .functional import is_comment_line, conv, is_pass_line, removes
+from .functional import is_comment_line, conv, is_pass_line, removes, recursive_search_keys, getter
 
 
 def loads(text: str) -> Dict[str, Any]:
@@ -44,7 +44,6 @@ def dumps(data: Dict[str, Any]) -> str:
     return fp.read()
 
 def dump(data: Dict[str, Any], fp: TextIOWrapper) -> None:
-    path = fp.name ; fp.close() ; fp = open(path, "w", encoding=fp.encoding, errors=fp.errors)
     fp.writelines([f"{i}={data[i]}\n" for i in data])
     fp.flush()
 
@@ -72,3 +71,14 @@ def load_tree(fp: TextIOWrapper, *, sep: str=".") -> str:
         exec(path_key+f"={data[i].__repr__()}")
     return tree_data
 
+def dumps_tree(data: Dict[str, Any], *, sep=".") -> str:
+    simple_data = {}
+    for key_path in recursive_search_keys(data):
+        simple_data[sep.join(key_path)] = getter(key_path, data)
+    return dumps(data)
+
+def dump_tree(data: Dict[str, Any], fp: TextIOWrapper, *, sep=".") -> None:
+    simple_data = {}
+    for key_path in recursive_search_keys(data):
+        simple_data[sep.join(key_path)] = getter(key_path, data)
+    dump(simple_data, fp)
