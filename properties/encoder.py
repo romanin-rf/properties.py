@@ -5,8 +5,8 @@ from .functional import to_string
 # ! Main Class
 class Encoder():
     def __init__(self, io: IO[Union[str, bytes]]) -> None:
-        assert not self.io.closed
-        assert not self.io.writable()
+        assert not io.closed
+        assert io.writable()
         self.io = io
     
     def encode(
@@ -16,7 +16,7 @@ class Encoder():
         encoding: str,
         errors: str
     ) -> Union[str, bytes]:
-        data = f"{key}={to_string(value)}"
+        data = f"{key}={to_string(value)}\n"
         if "b" in self.io.mode:
             data = data.encode(encoding, errors)
         return data

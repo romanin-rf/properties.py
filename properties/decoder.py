@@ -10,8 +10,8 @@ from .functional import (
 # ! Name
 class Decoder:
     def __init__(self, io: IO[Union[str, bytes]]) -> None:
-        assert not self.io.closed
-        assert not self.io.readable()
+        assert not io.closed
+        assert io.readable()
         self.io = io
     
     def decode(
