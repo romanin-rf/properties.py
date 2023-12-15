@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "properties.py"
+version = "1.2.0"
+description = "Module for reading/writing properties-files."
+repository = "https://github.com/romanin-rf/properties.py"
+keywords = ["properties", "java", "io", "file", "read", "write"]
+authors = ["Romanin <semina054@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "properties"}]
+classifiers = [
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX",
+    "Operating System :: Unix"
+]
+
+[tool.poetry.dependencies]
+python = ">=3.7"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

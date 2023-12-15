@@ -1,84 +1,38 @@
-from io import TextIOWrapper, StringIO
-from typing import Dict, Any
-# > Local Import's
-from .functional import is_comment_line, conv, is_pass_line, removes, recursive_search_keys, getter
+from io import BytesIO, StringIO
+from typing import IO, Literal, Union, Dict, Any
+# > Local Imports
+from .decoder import Decoder
+from .encoder import Encoder
 
+# ! Load Methods
+def loads(
+    data: Union[str, bytes, bytearray, memoryview],
+    encoding: str='utf-8',
+    errors: Literal['strict', 'ignore', 'replace']='strict'
+) -> Dict[str, Any]:
+    return Decoder(BytesIO(bytes(data))).load(encoding, errors)
 
-def loads(text: str) -> Dict[str, Any]:
-    d = {}
-    for line in StringIO(text).readlines():
-        if (not is_comment_line(line)) and (not is_pass_line(line)):
-            key, value, em = "", "", 0
-            for s in line:
-                if em == 0:
-                    if s == "=": em = 1
-                    elif s == " ": pass
-                    else: key += s
-                elif em == 1:
-                    if (len(value) == 0) and (s == " "): pass
-                    else: value += s
-            d[key] = conv(value)
-    return d
+def load(
+    io: IO[Union[str, bytes]],
+    encoding: str='utf-8',
+    errors: Literal['strict', 'ignore', 'replace']='strict'
+) -> None:
+    return Decoder(io).load(encoding, errors)
 
-def load(fp: TextIOWrapper) -> Dict[str, Any]:
-    d = {}
-    for line in fp.readlines():
-        if (not is_comment_line(line)) and (not is_pass_line(line)):
-            key, value, em = "", "", 0
-            for s in line:
-                if em == 0:
-                    if s == "=": em = 1
-                    elif s == " ": pass
-                    else: key += s
-                elif em == 1:
-                    if (len(value) == 0) and (s == " "): pass
-                    else: value += s
-            d[key] = conv(value)
-    return d
+def dumps(
+    data: Dict[str, Any],
+    encoding: str='utf-8',
+    errors: Literal['strict', 'ignore', 'replace']='strict'
+) -> str:
+    encoder = Encoder(StringIO())
+    encoder.dump(data, encoding, errors)
+    encoder.io.seek(0)
+    return encoder.io.read()
 
-def dumps(data: Dict[str, Any]) -> str:
-    fp = StringIO("")
-    fp.writelines([f"{i}={data[i]}\n" for i in data])
-    fp.flush()
-    fp.seek(0)
-    return fp.read()
-
-def dump(data: Dict[str, Any], fp: TextIOWrapper) -> None:
-    fp.writelines([f"{i}={data[i]}\n" for i in data])
-    fp.flush()
-
-def loads_tree(text: str, *, sep: str=".") -> Dict[str, Any]:
-    data, tree_data = loads(text), {}
-    for i in data:
-        path_keys, last_keys = removes(i.split(sep), [""]), []
-        for pk in path_keys:
-            last_keys.append(pk)
-            path_key = "tree_data{0}".format("".join([f"[{_.__repr__()}]" for _ in last_keys]))
-            try: eval(path_key)
-            except: exec(path_key+"=dict()")
-        exec(path_key+f"={data[i].__repr__()}")
-    return tree_data
-
-def load_tree(fp: TextIOWrapper, *, sep: str=".") -> str:
-    data, tree_data = load(fp), {}
-    for i in data:
-        path_keys, last_keys = removes(i.split(sep), [""]), []
-        for pk in path_keys:
-            last_keys.append(pk)
-            path_key = "tree_data{0}".format("".join([f"[{_.__repr__()}]" for _ in last_keys]))
-            try: eval(path_key)
-            except: exec(path_key+"=dict()")
-        exec(path_key+f"={data[i].__repr__()}")
-    return tree_data
-
-def dumps_tree(data: Dict[str, Any], *, sep=".") -> str:
-    simple_data = {}
-    for key_path in recursive_search_keys(data):
-        simple_data[sep.join(key_path)] = getter(key_path, data)
-    return dumps(data)
-
-def dump_tree(data: Dict[str, Any], fp: TextIOWrapper, *, sep=".") -> None:
-    simple_data = {}
-    for key_path in recursive_search_keys(data):
-        simple_data[sep.join(key_path)] = getter(key_path, data)
-    dump(simple_data, fp)
+def dump(
+    data: Dict[str, Any],
+    io: IO[Union[str, bytes]],
+    encoding: str='utf-8',
+    errors: Literal['strict', 'ignore', 'replace']='strict'
+) -> None:
+    Encoder(io).dump(data, encoding, errors)
